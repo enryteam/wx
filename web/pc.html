@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>wx 页面扫码支付</title>
+    
+    <script src="https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js"></script>
+</head>
+<body>
+
+		<input type='button' class='tijiao' value='提交'>
+		<img src='' class='img'>
+		<img src='' class='img1' id=''>
+		<div id='login_container'></div>
+<script>
+	$('.tijiao').click(function (){
+		$.post('../zbk_rest/index.php',{c:'wx_pc',a:'pay',price:'0.01'}, function(response) {
+			$('.img').attr('src','qrcode.php?data='+response);
+    });
+	})
+
+</script>
+</body>
+</html>

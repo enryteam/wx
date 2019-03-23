@@ -1,0 +1,5 @@
+
+    <view class='m-b1 m-w18 m-m3 m-bj-white' >
+         <span class="order-btn red" bindtap="fukuan">付款</span>
+    </view>
+

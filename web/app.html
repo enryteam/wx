@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <title>Title</title>
+    <script type="text/javascript" src="js/common.js"></script>
+</head>
+<script>
+    //支付
+    var channel=null;
+    var userId=localStorage.user_id;
+    var openid=localStorage.openid;
+    var money=900;
+
+
+    // 1. 获取支付通道
+    function plusReady(){
+        // 隐藏滚动条
+        plus.webview.currentWebview().setStyle({scrollIndicator:'none'});
+        // 获取支付通道
+        plus.payment.getChannels(function(channels){
+            channel=channels[0];
+            //alert(JSON.stringify(channels));
+        },function(e){
+            alert("获取支付通道失败："+e.message);
+        });
+    }
+    document.addEventListener('plusready',plusReady,false);
+
+    //var WXPAYSERVER='https://wx.enry.cn/zbk_rest/index.php?c=order&a=wxcode&amount=1&user_id=23&cate=1&type=1&openid=otrdz56BZvWVwLQRu4Zn32lG4vu4';
+    //var WXPAYSERVER='http://llwx.51daniu.cn/zbk_rest/index.php?c=order&a=wxcode&amount=0.01&user_id='+userId+'&cate=1&type=1&openid='+wwww;
+    //var WXPAYSERVER='http://demo.dcloud.net.cn/payment/wxpayv3.HBuilder/?total=0.01';
+    //var WXPAYSERVER='https://wx.enry.cn/zbk_rest/wxapp/index.php?total=1';
+    var w=null;
+    // 2. 发起支付请求
+    function pay(id){
+        if(w){return;}//检查是否请求订单中
+        // 从服务器请求支付订单
+        var PAYSERVER='';
+        var ALIPAYSERVER='http://demo.dcloud.net.cn/helloh5/payment/alipay.php?total=1';
+        var WXPAYSERVER='https://www.xxx.com/rest/index.php?c=order&a=wxcode&amount='+money+'&user_id='+userId+'&cate=1&type=1&openid='+openid;//后台业务地址
+        if(id=='alipay'){
+            PAYSERVER=ALIPAYSERVER;
+        }else if(id=='wxpay'){
+            PAYSERVER=WXPAYSERVER;
+            // alert(PAYSERVER)
+        }else{
+            plus.nativeUI.alert("不支持此支付通道！",null,"");
+            return;
+        }
+        w=plus.nativeUI.showWaiting();
+        var xhr=new XMLHttpRequest();
+        xhr.onreadystatechange=function(){
+            switch(xhr.readyState){
+                case 4:
+                    w.close();w=null;
+                    if(xhr.status==200){
+                        //console.log(JSON.stringify(param));
+                        /*   alert(xhr.responseText);
+                           alert(typeof (xhr.responseText));
+                           console.log(xhr.responseText);
+                           console.log(JSON.stringify(channel));*/
+                        plus.payment.request(channel,xhr.responseText,function(result){
+                            //console.log(JSON.stringify(result));
+                            zy_msg("支付成功!" );
+                            /*plus.nativeUI.alert("支付成功！",function(){
+                                back();
+                            });*/
+                        },function(error){
+                            //alert(JSON.stringify(error));
+                            zy_msg("取消支付");
+                            //plus.nativeUI.alert("支付失败：" + error.code);
+                        });
+                    }else{
+                        alert("获取订单信息失败！");
+                    }
+                    break;
+                default:
+                    break;
+            }
+        };
+        xhr.open('GET',PAYSERVER);
+        xhr.send();
+    }
+</script>
+<body>
+<div style="width: 200px;height: 40px;line-height: 40px;text-align: center;font-size: 14px;border-radius: 50px;color: green;margin: 20% auto;border: 1px green solid" onclick="pay('weixin')">微信支付</div>
+</body>
+</html>
